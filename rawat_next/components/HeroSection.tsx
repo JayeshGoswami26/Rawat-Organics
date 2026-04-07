@@ -1,222 +1,260 @@
-'use client'
+"use client";
 
 /**
  * HeroSection — Canvas-Based Image Sequence Scrubbing
  * ─────────────────────────────────────────────────────────────────────────────
  * Video scrubbers are notoriously prone to decoder jank.
  * This architecture uses an Image Sequence (121 frames of high-res .pngs).
- * 
+ *
  * 1. Preload 121 `HTMLImageElement`s into memory during mount.
  * 2. Connect Framer Motion's scroll directly to target frame index.
  * 3. Draw `images[currentIndex]` to `<canvas>` synchronously in the RAF loop.
- * 
+ *
  * This creates a perfect, zero-lag timeline identical to Apple's implementation.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useRef, useEffect, useCallback, useState } from 'react'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
+import { useRef, useEffect, useCallback, useState } from "react";
+import { motion, useScroll, useTransform, useSpring, useVelocity } from "framer-motion";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const FRAME_COUNT      = 121
-const MIN_DELTA        = 0.001
-const ZOOM_START       = 1.0
-const ZOOM_END         = 1.10
-const BRIGHTNESS_START = 0.88
-const BRIGHTNESS_MID   = 0.65
-const BRIGHTNESS_END   = 0.52
+const FRAME_COUNT = 121;
+const MIN_DELTA = 0.001;
+const ZOOM_START = 1.0;
+const ZOOM_END = 1.1;
+const BRIGHTNESS_START = 0.88;
+const BRIGHTNESS_MID = 0.65;
+const BRIGHTNESS_END = 0.52;
 
 // ─── Utility helpers ─────────────────────────────────────────────────────────
-const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi)
+const clamp = (v: number, lo: number, hi: number) =>
+  Math.min(Math.max(v, lo), hi);
 const mapRange = (v: number, a: number, b: number, c: number, d: number) =>
-  c + ((v - a) / (b - a)) * (d - c)
+  c + ((v - a) / (b - a)) * (d - c);
 
 export default function HeroSection() {
   // ─── DOM refs ──────────────────────────────────────────────────────────────
-  const containerRef = useRef<HTMLDivElement>(null)
-  const canvasRef    = useRef<HTMLCanvasElement>(null)
-  const canvasWrapRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasWrapRef = useRef<HTMLDivElement>(null);
 
   // ─── State & Refs ──────────────────────────────────────────────────────────
-  const imagesRef      = useRef<HTMLImageElement[]>([])
-  const rafRef         = useRef<number | null>(null)
-  const canvasSize     = useRef({ w: 0, h: 0 })
-  const targetProgress = useRef(0)
-  const smoothProgress = useRef(0)
-  const lastDrawnFrame = useRef(-1)
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const rafRef = useRef<number | null>(null);
+  const canvasSize = useRef({ w: 0, h: 0 });
+  const targetProgress = useRef(0);
+  const smoothProgress = useRef(0);
+  const lastDrawnFrame = useRef(-1);
 
   // ─── Framer Motion scroll ─────────────────────────────────────────────────
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end end'],
-  })
+    offset: ["start start", "end end"],
+  });
 
   // Tighter Spring: Instant but smooth tracking for mouse wheels, no lag for trackpads
+  // const springProgress = useSpring(scrollYProgress, {
+  //   stiffness: 400,
+  //   damping: 40,
+  //   mass: 0.2,
+  //   restDelta: 0.001,
+  // })
   const springProgress = useSpring(scrollYProgress, {
-    stiffness: 400,
-    damping: 40,
-    mass: 0.2,
-    restDelta: 0.001,
-  })
+    stiffness: 120, // lower = smoother glide
+    damping: 20, // controls bounce
+    mass: 0.3,
+  });
+
+  const velocity = useVelocity(scrollYProgress);
 
   // ─── Framer Motion derived values ─────────────────────────────────────────
-  const textOpacity      = useTransform(springProgress, [0, 0.22], [1, 0])
-  const textY            = useTransform(springProgress, [0, 0.35], ['0%', '-28%'])
-  const fogOpacity       = useTransform(springProgress, [0, 0.7],  [0.25, 0.75])
-  const indicatorOpacity = useTransform(springProgress, [0, 0.1],  [1, 0])
+  const textOpacity = useTransform(springProgress, [0, 0.22], [1, 0]);
+  const textY = useTransform(springProgress, [0, 0.35], ["0%", "-28%"]);
+  const fogOpacity = useTransform(springProgress, [0, 0.7], [0.25, 0.75]);
+  const indicatorOpacity = useTransform(springProgress, [0, 0.1], [1, 0]);
 
   // ─── Draw Frame to Canvas ─────────────────────────────────────────────────
   const drawFrame = useCallback((frameIndex: number) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d', { alpha: false }) // Disable alpha for huge perf boost
-    if (!ctx) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false }); // Disable alpha for huge perf boost
+    if (!ctx) return;
 
-    const imgs = imagesRef.current
-    if (!imgs[frameIndex]) return
+    const imgs = imagesRef.current;
+    if (!imgs[frameIndex]) return;
 
-    const img = imgs[frameIndex]
-    
+    const img = imgs[frameIndex];
+
     // Set canvas internal resolution to match the image exactly (e.g. 1280x720)
     // CSS object-fit: cover scales it up for free on the GPU
-    const w = img.naturalWidth || 1280
-    const h = img.naturalHeight || 720
+    const scale = 0.75; // tweak this
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
+    // const w = img.naturalWidth || 1280;
+    // const h = img.naturalHeight || 720;
 
     if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w
-      canvas.height = h
+      canvas.width = w;
+      canvas.height = h;
     }
 
-    ctx.drawImage(img, 0, 0, w, h)
-    lastDrawnFrame.current = frameIndex
-  }, [])
+    ctx.drawImage(img, 0, 0, w, h);
+    lastDrawnFrame.current = frameIndex;
+  }, []);
 
   // ─── Initialization & Preloading ──────────────────────────────────────────
   useEffect(() => {
-    // 1. Preload image sequence efficiently without freezing React main thread
-    let loadedCount = 0
-    const loadedImages: HTMLImageElement[] = []
+    // 1. Preload image sequence efficiently without freezing React main thread-`
+    let loadedCount = 0;
+    const loadedImages: HTMLImageElement[] = [];
 
-    for (let i = 1; i <= FRAME_COUNT; i++) {
-      const img = new Image()
-      const paddedIndex = i.toString().padStart(4, '0')
-      img.src = `/frames/frame_${paddedIndex}.png`
-      
-      img.onload = () => {
-        loadedCount++
-        
-        // Directly update DOM to avoid 121 React re-renders which freezes the browser!
-        const loaderText = document.getElementById('hero-loading-text')
-        if (loaderText) {
-          loaderText.innerText = `Loading Experience... ${Math.round((loadedCount / FRAME_COUNT) * 100)}%`
-        }
-        
-        // When all frames are loaded, we can fade out the loader overlay
-        if (loadedCount === FRAME_COUNT) {
-          const loaderOverlay = document.getElementById('hero-loader')
-          if (loaderOverlay) {
-            loaderOverlay.style.opacity = '0'
-            setTimeout(() => { loaderOverlay.style.display = 'none' }, 1000)
-          }
-        }
-
-        // If it's the very first frame and we haven't drawn yet, draw it immediately
-        if (i === 1 && lastDrawnFrame.current === -1) {
-          drawFrame(1)
+    const checkAllLoaded = () => {
+      if (loadedCount === FRAME_COUNT) {
+        const loaderOverlay = document.getElementById("hero-loader");
+        if (loaderOverlay) {
+          loaderOverlay.style.opacity = "0";
+          setTimeout(() => {
+            loaderOverlay.style.pointerEvents = "none";
+          }, 800);
         }
       }
-      loadedImages[i] = img
-    }
-    imagesRef.current = loadedImages
+    };
+
+    const preloadBatch = async (start: number, end: number) => {
+      for (let i = start; i <= end; i++) {
+        const img = new Image();
+        const paddedIndex = i.toString().padStart(4, "0");
+        img.src = `/frames/frame_${paddedIndex}.webp`;
+
+        await img.decode(); // 🔥 ensures no frame stutter later
+
+        loadedCount++;
+
+        const loaderText = document.getElementById("hero-loading-text");
+        if (loaderText) {
+          loaderText.innerText = `Loading Experience... ${Math.round((loadedCount / FRAME_COUNT) * 100)}%`;
+        }
+
+        checkAllLoaded();
+
+        loadedImages[i] = img;
+        imagesRef.current = loadedImages;
+
+        // draw first frame immediately
+        if (i === 1 && lastDrawnFrame.current === -1) {
+          drawFrame(1);
+        }
+      }
+    };
+
+    // Load first chunk fast (critical for UX)
+    preloadBatch(1, 30);
+
+    // Load rest in background (non-blocking)
+    setTimeout(() => preloadBatch(31, 80), 100);
+    setTimeout(() => preloadBatch(81, FRAME_COUNT), 200);
 
     // 2. Setup Resize Handler
     // Canvas internal buffer size is now locked to the image size.
     // CSS handles resizing completely.
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     // Initial paint if resize occurs before scroll
     const updateSize = () => {
       if (lastDrawnFrame.current !== -1) {
-        drawFrame(lastDrawnFrame.current)
+        drawFrame(lastDrawnFrame.current);
       }
-    }
-    window.addEventListener('resize', updateSize)
+    };
+    window.addEventListener("resize", updateSize);
 
     // 3. Subscribe to Scroll
     // By subscribing directly to springProgress instead of scrollYProgress,
     // we get Framer Motion's buttery smooth spring physics out of the box,
     // completely eliminating the need for a manual lerp loop that causes jumpiness!
-    targetProgress.current = springProgress.get()
-    smoothProgress.current = targetProgress.current
+    targetProgress.current = springProgress.get();
+    smoothProgress.current = targetProgress.current;
 
-    const unsubscribe = springProgress.on('change', (v) => {
-      targetProgress.current = v
-    })
+    const unsubscribe = springProgress.on("change", (v) => {
+      targetProgress.current = v;
+    });
 
     // 4. Main Animation Loop
     const tick = () => {
-      rafRef.current = requestAnimationFrame(tick)
+      rafRef.current = requestAnimationFrame(tick);
 
-      if (imagesRef.current.length < 2) return
+      if (imagesRef.current.length < 2) return;
 
+      const progress = springProgress.get();
       // springProgress already handles the physics! No lerp needed.
-      const prev = smoothProgress.current
-      smoothProgress.current = clamp(targetProgress.current, 0, 1)
+      const prev = progress;
+      // smoothProgress.current = clamp(targetProgress.current, 0, 1);
 
-      const delta = Math.abs(smoothProgress.current - prev)
+      const delta = Math.abs(progress - prev);
 
       if (delta > MIN_DELTA || lastDrawnFrame.current === -1) {
+
         // Map 0..1 to 1..121
-        const floatFrame = mapRange(smoothProgress.current, 0, 1, 1, FRAME_COUNT)
-        const targetFrame = Math.round(floatFrame)
+        const floatFrame = mapRange(progress, 0, 1, 1, FRAME_COUNT);
+        const targetFrame = Math.floor(floatFrame);
 
         // Only draw if the frame actually changed
-        if (targetFrame !== lastDrawnFrame.current && imagesRef.current[targetFrame]?.complete) {
-          drawFrame(targetFrame)
+        // if (targetFrame !== lastDrawnFrame.current && imagesRef.current[targetFrame]?.complete)
+        if (
+          targetFrame !== lastDrawnFrame.current &&
+          imagesRef.current[targetFrame] &&
+          imagesRef.current[targetFrame].complete
+        ) {
+          drawFrame(targetFrame);
         }
       }
 
       // Parallax / Zoom / Brightness (Hardware Accelerated style mutations)
-      const zoom = mapRange(smoothProgress.current, 0, 1, ZOOM_START, ZOOM_END)
+      const zoom = mapRange(progress, 0, 1, ZOOM_START, ZOOM_END);
       if (canvasWrapRef.current) {
-        canvasWrapRef.current.style.transform = `scale(${zoom.toFixed(4)})`
+        canvasWrapRef.current.style.transform = `scale(${zoom.toFixed(4)})`;
       }
 
       // Convert Brightness range to Darkness Opacity
-      const p = smoothProgress.current
-      const darkness = p < 0.5
-        ? mapRange(p, 0, 0.5, 1 - BRIGHTNESS_START, 1 - BRIGHTNESS_MID)
-        : mapRange(p, 0.5, 1, 1 - BRIGHTNESS_MID, 1 - BRIGHTNESS_END)
-      
-      const darkOverlay = document.getElementById('hero-dark-overlay')
-      if (darkOverlay) {
-        darkOverlay.style.opacity = darkness.toFixed(3)
-      }
-    }
+      const p = progress;
+      const darkness =
+        p < 0.5
+          ? mapRange(p, 0, 0.5, 1 - BRIGHTNESS_START, 1 - BRIGHTNESS_MID)
+          : mapRange(p, 0.5, 1, 1 - BRIGHTNESS_MID, 1 - BRIGHTNESS_END);
 
-    rafRef.current = requestAnimationFrame(tick)
+      const darkOverlay = document.getElementById("hero-dark-overlay");
+      if (darkOverlay) {
+        darkOverlay.style.opacity = darkness.toFixed(3);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
 
     // Cleanup
     return () => {
-      window.removeEventListener('resize', updateSize)
-      unsubscribe()
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    }
-  }, [scrollYProgress, drawFrame])
+      window.removeEventListener("resize", updateSize);
+      unsubscribe();
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [scrollYProgress, drawFrame]);
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <div ref={containerRef} className="relative" style={{ height: '300vh' }} id="hero">
-      
+    <div
+      ref={containerRef}
+      className="relative"
+      // style={{ height: "300vh" }}
+      style={{ height: "180vh" }}
+      id="hero"
+    >
       {/* Loading Overlay manually controlled by DOM to avoid React render freezes */}
-      <div 
+      <div
         id="hero-loader"
         className="fixed inset-0 z-50 flex items-center justify-center bg-background text-primary transition-opacity duration-1000 pointer-events-none"
       >
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="text-sm font-headline tracking-widest uppercase flex flex-col items-center gap-4"
         >
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -225,25 +263,31 @@ export default function HeroSection() {
       </div>
 
       {/* Viewport-pinned scene */}
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
         <div
           ref={canvasWrapRef}
           style={{
-            position: 'absolute',
+            position: "absolute",
             inset: 0,
-            transformOrigin: 'center center',
-            willChange: 'transform',
+            transformOrigin: "center center",
+            willChange: "transform",
           }}
         >
           <canvas
             ref={canvasRef}
             style={{
-              position: 'absolute',
+              position: "absolute",
               inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
               // Removed filter willChange for performance
             }}
           />
@@ -251,12 +295,12 @@ export default function HeroSection() {
           <div
             id="hero-dark-overlay"
             style={{
-              position: 'absolute',
+              position: "absolute",
               inset: 0,
-              backgroundColor: '#000',
+              backgroundColor: "#000",
               opacity: 1 - BRIGHTNESS_START,
-              willChange: 'opacity',
-              pointerEvents: 'none',
+              willChange: "opacity",
+              pointerEvents: "none",
             }}
           />
         </div>
@@ -264,20 +308,25 @@ export default function HeroSection() {
         {/* ── FOG / DEPTH OVERLAY ──────────────────────────────────────────── */}
         <motion.div
           style={{
-            position: 'absolute', inset: 0, zIndex: 10,
+            position: "absolute",
+            inset: 0,
+            zIndex: 10,
             opacity: fogOpacity,
-            pointerEvents: 'none',
+            pointerEvents: "none",
             background:
-              'radial-gradient(ellipse 120% 60% at 50% 100%, rgba(2,28,16,0.85) 0%, transparent 70%)',
+              "radial-gradient(ellipse 120% 60% at 50% 100%, rgba(2,28,16,0.85) 0%, transparent 70%)",
           }}
         />
 
         {/* ── GRADIENT OVERLAY ────────────────────────────────────────────── */}
         <div
           style={{
-            position: 'absolute', inset: 0, zIndex: 11, pointerEvents: 'none',
+            position: "absolute",
+            inset: 0,
+            zIndex: 11,
+            pointerEvents: "none",
             background:
-              'linear-gradient(to bottom, rgba(2,28,16,0.38) 0%, rgba(2,28,16,0.08) 40%, rgba(2,28,16,0.55) 100%)',
+              "linear-gradient(to bottom, rgba(2,28,16,0.38) 0%, rgba(2,28,16,0.08) 40%, rgba(2,28,16,0.55) 100%)",
           }}
         />
 
@@ -301,10 +350,16 @@ export default function HeroSection() {
             className="text-white font-headline font-extrabold text-5xl md:text-8xl tracking-tighter mb-8 leading-[1.05]"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 1.1,
+              delay: 0.5,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
           >
-            Pure.{' '}
-            <span className="italic font-light text-primary-fixed/90">Natural.</span>{' '}
+            Pure.{" "}
+            <span className="italic font-light text-primary-fixed/90">
+              Natural.
+            </span>{" "}
             Organic.
           </motion.h1>
           <motion.p
@@ -351,9 +406,13 @@ export default function HeroSection() {
         {/* ── PROGRESS BAR ────────────────────────────────────────────────── */}
         <motion.div
           className="absolute bottom-0 left-0 h-[2px] bg-primary-fixed/60"
-          style={{ scaleX: springProgress, transformOrigin: 'left', zIndex: 30 }}
+          style={{
+            scaleX: springProgress,
+            transformOrigin: "left",
+            zIndex: 30,
+          }}
         />
       </div>
     </div>
-  )
+  );
 }
