@@ -43,7 +43,7 @@ export default function Navbar() {
             scrolled ? 'text-primary' : 'text-white'
           }`}
         >
-          Rawat Organics
+          Rawat Organic
         </a>
 
         {/* Desktop links */}

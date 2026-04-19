@@ -11,21 +11,21 @@ Note: _This is purely the output of the chat conversation and does not contain a
 Get the images and code for the following Stitch project's screens:
 
 ## Project
-Title: Rawat Organics Landing Page
+Title: Rawat Organic Landing Page
 ID: 10291338727834035956
 
 ## Screens:
-1. Rawat Organics Landing Page
+1. Rawat Organic Landing Page
    ID: 39b6c35d00ae49028c970b522da0f735
 
 Use a utility like `curl -L` to download the hosted URLs.
 
 ---
 
-# 🌿 Rawat Organics Landing Page – Development Workflow
+# 🌿 Rawat Organic Landing Page – Development Workflow
 
 ## 🎯 Objective
-Build a premium, high-performance landing page for Rawat Organics using React (Vite), Tailwind CSS, and modern animation libraries.
+Build a premium, high-performance landing page for Rawat Organic using React (Vite), Tailwind CSS, and modern animation libraries.
 
 The UI must follow the Stitch design exactly but be implemented using reusable, scalable component architecture.
 

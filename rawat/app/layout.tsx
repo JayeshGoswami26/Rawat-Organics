@@ -19,7 +19,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Rawat Organics | The Botanical Atelier",
+  title: "Rawat Organic | The Botanical Atelier",
   description:
     "Pure, natural, organic — a botanical atelier dedicated to cultivating the essence of nature’s most refined harvests.",
 };
