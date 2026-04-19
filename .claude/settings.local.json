@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Read(//c/Users/MY PC/.claude/projects/c--Users-MY-PC-Desktop-Rawat-Organics/**)",
+      "Read(//c/Users/MY PC/.claude/projects/c--Users-MY-PC-Desktop-Rawat-Organics/memory/**)"
+    ]
+  }
+}

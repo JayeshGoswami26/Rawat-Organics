@@ -9,9 +9,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => {
-      // The hero is 300vh tall. We transition the nav when we scroll past it.
-      // 2.8 * window.innerHeight triggers right as the 'Our Story' section comes up.
-      setScrolled(window.scrollY > window.innerHeight * 2.8)
+      // Hero is 180vh. Trigger nav glass effect just after the hero's sticky viewport exits.
+      setScrolled(window.scrollY > window.innerHeight * 1.75)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll() // check immediately on mount

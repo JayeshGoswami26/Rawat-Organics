@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 @tailwind base;
@@ -12,7 +12,6 @@
 
   body {
     @apply bg-background text-on-surface font-body;
-    selection-color: #ccead6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -44,10 +43,45 @@
   }
 
   .editorial-shadow {
-    box-shadow: 0 20px 40px -15px rgba(26, 28, 25, 0.06);
+    box-shadow: 0 20px 40px -15px rgba(26, 28, 25, 0.08);
   }
 
-  /* Scroll-driven video hero styles */
+  /* ── Scroll Indicator ─────────────────────────────────────────── */
+  .scroll-indicator {
+    animation: scrollBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(8px); opacity: 0.5; }
+  }
+
+  /* ── Noise texture overlay ───────────────────────────────────── */
+  .noise-overlay {
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* ── Marquee ─────────────────────────────────────────────────── */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 35s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /* ── Hero video/canvas styles ───────────────────────────────── */
   .hero-scroll-container {
     position: relative;
     height: 300vh;
@@ -73,36 +107,22 @@
   .fog-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      ellipse at center bottom,
-      rgba(2, 28, 16, 0.15) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse at center top,
-      rgba(2, 28, 16, 0.1) 0%,
-      transparent 50%
-    );
+    background:
+      radial-gradient(ellipse at center bottom, rgba(2, 28, 16, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at center top, rgba(2, 28, 16, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: 2;
   }
 
-  .scroll-indicator {
-    animation: scrollBounce 2s ease-in-out infinite;
+  /* ── Section transition helper ──────────────────────────────── */
+  .section-fade-in {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
   }
 
-  @keyframes scrollBounce {
-    0%, 100% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(8px); opacity: 0.5; }
-  }
-
-  /* Noise texture overlay */
-  .noise-overlay {
-    position: absolute;
-    inset: 0;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 3;
+  .section-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
