@@ -39,9 +39,8 @@ export default function ProcessSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="py-32 bg-surface relative overflow-hidden" ref={ref}>
-      {/* Subtle background texture */}
-      <div className="noise-overlay opacity-[0.025]" />
+    <section className="py-32 bg-primary relative overflow-hidden" ref={ref}>
+      <div className="noise-overlay opacity-[0.04]" />
 
       <div className="max-w-screen-2xl mx-auto px-8 relative z-10">
         {/* Header */}
@@ -51,16 +50,16 @@ export default function ProcessSection() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-secondary font-headline font-bold tracking-[0.2em] uppercase text-sm mb-4 block">
+            <span className="text-primary-fixed-dim font-headline font-bold tracking-[0.2em] uppercase text-sm mb-4 block opacity-60">
               Our Process
             </span>
-            <h2 className="text-primary font-headline font-extrabold text-4xl md:text-6xl leading-tight">
+            <h2 className="text-primary-fixed font-headline font-extrabold text-4xl md:text-6xl leading-tight">
               From Earth{' '}
-              <span className="font-light italic">to Table</span>
+              <span className="font-light italic text-primary-fixed/70">to Table</span>
             </h2>
           </motion.div>
           <motion.p
-            className="text-on-surface/60 max-w-xs text-sm leading-relaxed md:text-right"
+            className="text-primary-fixed/50 max-w-xs text-sm leading-relaxed md:text-right"
             initial={{ opacity: 0, y: 24 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.15 }}
@@ -76,7 +75,7 @@ export default function ProcessSection() {
             className="hidden lg:block absolute top-[1.9rem] left-8 right-8 h-px"
             style={{
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(115,121,115,0.25) 15%, rgba(115,121,115,0.25) 85%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, rgba(204,234,214,0.15) 15%, rgba(204,234,214,0.15) 85%, transparent 100%)',
             }}
             initial={{ scaleX: 0 }}
             animate={inView ? { scaleX: 1 } : {}}
@@ -86,7 +85,7 @@ export default function ProcessSection() {
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
-              className="relative flex flex-col px-8 pb-12 pt-0 group border-b lg:border-b-0 lg:border-r border-outline-variant/20 last:border-0"
+              className="relative flex flex-col px-8 pb-12 pt-0 group border-b lg:border-b-0 lg:border-r border-primary-container/30 last:border-0"
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{
@@ -96,22 +95,22 @@ export default function ProcessSection() {
               }}
             >
               {/* Step dot */}
-              <div className="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-outline-variant/40 flex items-center justify-center mb-8 group-hover:border-primary group-hover:bg-primary-container transition-all duration-500 shrink-0">
+              <div className="relative z-10 w-16 h-16 rounded-full bg-primary-container/40 border-2 border-primary-container flex items-center justify-center mb-8 group-hover:border-primary-fixed/40 group-hover:bg-primary-container transition-all duration-500 shrink-0">
                 <span
-                  className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors duration-500"
+                  className="material-symbols-outlined text-primary-fixed/60 group-hover:text-primary-fixed transition-colors duration-500"
                   style={{ fontSize: '24px', fontVariationSettings: "'FILL' 0, 'wght' 200" }}
                 >
                   {step.icon}
                 </span>
               </div>
 
-              <span className="font-headline font-extrabold text-xs tracking-[0.3em] text-secondary/60 uppercase mb-3">
+              <span className="font-headline font-extrabold text-xs tracking-[0.3em] text-primary-fixed/30 uppercase mb-3">
                 {step.number}
               </span>
-              <h3 className="font-headline font-extrabold text-3xl text-primary mb-4 group-hover:translate-x-1 transition-transform duration-300">
+              <h3 className="font-headline font-extrabold text-3xl text-primary-fixed mb-4 group-hover:translate-x-1 transition-transform duration-300">
                 {step.title}
               </h3>
-              <p className="text-on-surface/55 text-sm leading-relaxed">{step.description}</p>
+              <p className="text-primary-fixed/50 text-sm leading-relaxed">{step.description}</p>
             </motion.div>
           ))}
         </div>

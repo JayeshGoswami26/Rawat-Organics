@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import SpotlightCard from './ui/SpotlightCard'
 
 const categories = [
   {
@@ -99,6 +100,10 @@ export default function CollectionSection() {
               whileHover={{ y: -4 }}
               className="h-full"
             >
+              <SpotlightCard
+                className="h-full rounded-[2rem]"
+                spotlightColor="rgba(2, 28, 16, 0.07)"
+              >
               <Link
                 href={cat.href}
                 className="group flex flex-col h-full relative overflow-hidden rounded-[2rem] bg-surface-container-lowest editorial-shadow hover:shadow-2xl transition-shadow duration-500"
@@ -154,6 +159,7 @@ export default function CollectionSection() {
                   </div>
                 </div>
               </Link>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>
