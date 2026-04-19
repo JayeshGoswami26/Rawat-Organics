@@ -13,7 +13,7 @@ export default function WholeSpicesLayout({
         <div className="hidden md:flex items-center gap-12">
           <a className="text-[#6c5b4e] dark:text-[#fafaf5]/60 hover:text-[#021c10] dark:hover:text-[#fafaf5] transition-colors" href="/">Home</a>
           <a className="text-[#021c10] dark:text-[#fafaf5] border-b-2 border-[#021c10] dark:border-[#fafaf5] pb-1" href="/whole-spices">Whole Spices</a>
-          <a className="text-[#6c5b4e] dark:text-[#fafaf5]/60 hover:text-[#021c10] dark:hover:text-[#fafaf5] transition-colors" href="/">Powdered Spices</a>
+          <a className="text-[#6c5b4e] dark:text-[#fafaf5]/60 hover:text-[#021c10] dark:hover:text-[#fafaf5] transition-colors" href="/powder-spices">Powder Spices</a>
         </div>
         <div className="flex items-center gap-6">
           <button className="hover:opacity-80 transition-opacity hover:scale-105 duration-300 ease-in-out text-primary">

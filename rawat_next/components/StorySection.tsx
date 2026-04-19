@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, useInView } from 'framer-motion'
+import BlurText from './ui/BlurText'
 import { useRef } from 'react'
 import Image from 'next/image'
 
@@ -22,7 +23,7 @@ export default function StorySection() {
           <motion.div className="lg:col-span-5 relative" {...fadeUp(0)}>
             <div className="relative z-10 aspect-[4/5] rounded-3xl overflow-hidden editorial-shadow">
               <Image
-                src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80"
+                src="/cardImages/image-2.png"
                 alt="Hands holding fresh organic soil with green sprouts"
                 fill
                 className="object-cover"
@@ -31,7 +32,7 @@ export default function StorySection() {
             {/* Decorative inset image */}
             <div className="absolute -bottom-12 -right-12 w-2/3 aspect-square rounded-3xl overflow-hidden editorial-shadow border-8 border-surface z-20 hidden md:block">
               <Image
-                src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4e4?w=800&q=80"
+                src="/cardImages/image-1.png"
                 alt="Organic lentils and seeds arranged in rustic wooden bowls"
                 fill
                 className="object-cover"
@@ -48,14 +49,13 @@ export default function StorySection() {
               Our Legacy
             </motion.span>
 
-            <motion.h2
-              className="text-primary font-headline font-extrabold text-4xl md:text-6xl mb-8 leading-tight"
-              {...fadeUp(0.2)}
-            >
-              The Rawat Story:{' '}
-              <br />
-              <span className="font-light italic">A Botanical Atelier</span>
-            </motion.h2>
+            <BlurText
+              text="The Rawat Story: A Botanical Atelier"
+              className="text-primary font-headline font-extrabold text-4xl md:text-5xl mb-8 leading-tight"
+              delay={110}
+              animateBy="words"
+              direction="top"
+            />
 
             <motion.div
               className="space-y-6 text-on-surface/80 text-lg leading-relaxed max-w-xl"

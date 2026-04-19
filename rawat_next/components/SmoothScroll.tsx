@@ -12,11 +12,10 @@ export default function SmoothScroll({
     <ReactLenis
       root
       options={{
-        // Native wheel/trackpad — avoids Lenis “floaty” lag (~1s catch-up)
-        smoothWheel: false,
-        syncTouch: true,
-        touchMultiplier: 1,
-        wheelMultiplier: 1,
+        smoothWheel: false,   // Native wheel — no floaty lag
+        syncTouch: false,     // Native touch scroll — no RAF overhead
+        lerp: 1,              // lerp=1 means instant, zero easing cost
+        duration: 0,
       }}
     >
       {children}
