@@ -30,7 +30,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${manrope.variable} scroll-smooth`}>
+    <html lang="en" className={`${plusJakarta.variable} ${manrope.variable}`}>
       <head>
         <link
           rel="stylesheet"
