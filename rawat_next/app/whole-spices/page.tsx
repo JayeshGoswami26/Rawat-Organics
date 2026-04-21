@@ -1,148 +1,180 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import SpotlightCard from '@/components/ui/SpotlightCard'
-import BlurText from '@/components/ui/BlurText'
+import Image from 'next/image'
 import Link from 'next/link'
+import { wholeSpices } from '@/lib/products'
+import Navbar from '@/components/Navbar'
 
-const wholeSpices = [
-  { name: 'Cumin', desc: 'Warm, earthy seeds — the aromatic heartbeat of South Asian and Middle Eastern cuisine.', color: '#B45309' },
-  { name: 'Chilli', desc: 'Sun-dried whole chillies with rich, fiery heat and deeply vibrant red color.', color: '#DC2626' },
-  { name: 'Turmeric', desc: 'Golden rhizome roots with earthy depth, mild bitterness, and potent anti-inflammatory properties.', color: '#D97706' },
-  { name: 'Coriander', desc: 'Light, citrusy seeds with a delicate floral undertone and warming spice.', color: '#92400E' },
-  { name: 'Celery Seeds', desc: 'Small yet bold — a distinctive warm, slightly bitter flavor that elevates every dish.', color: '#4D7C0F' },
-  { name: 'Ginger', desc: 'Pungent dried roots with warming spice, bright citrus notes, and digestive benefits.', color: '#D97706' },
-  { name: 'Fennel', desc: 'Sweet anise-like seeds with a refreshing, licorice-forward aroma and mild sweetness.', color: '#065F46' },
-  { name: 'Fenugreek', desc: 'Bitter-sweet seeds packed with nutrients and a unique maple-like finish when roasted.', color: '#78350F' },
-  { name: 'Ajwain', desc: "Thyme-like, digestive seeds with intense, camphor-tinged heat — powerful in every pinch.", color: '#57534E' },
-  { name: 'Asafoetida', desc: 'Pungent resin with a powerful umami character that transforms completely when cooked.', color: '#A16207' },
-  { name: 'Black Pepper', desc: 'The universal spice — bold heat with citrus and woody depth. The king of spices.', color: '#374151' },
-  { name: 'Green Cardamom', desc: 'Floral, sweet pods with eucalyptus notes and bright, complex aromatics. Royally fragrant.', color: '#065F46' },
-  { name: 'Cassia', desc: 'Thick, robust bark with intense cinnamon-like warmth and bold, lingering spice.', color: '#78350F' },
-  { name: 'Cinnamon', desc: 'Delicate, sweet quills with a refined, warm, and woody fragrance. Ceylon\'s finest.', color: '#B45309' },
-  { name: 'Clove', desc: 'Intensely aromatic dried buds with numbing warmth, depth, and a bold floral note.', color: '#292524' },
-  { name: 'Dill Seeds', desc: 'Herbal, slightly anise-flavored seeds with a clean, fresh, delicate finish.', color: '#4D7C0F' },
-  { name: 'Garlic', desc: 'Pungent, essential dried bulbs — the irreplaceable foundation of bold, savory flavors worldwide.', color: '#78716C' },
-  { name: 'Star Anise', desc: 'Star-shaped pods with a sweet, intense licorice and fennel aroma. Beautiful and bold.', color: '#92400E' },
-  { name: 'Black Cardamom', desc: 'Smoky, camphor-rich pods — ideal for slow-cooked, deeply aromatic preparations.', color: '#1F2937' },
-]
-
-const staggerContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-}
-
-const cardVariant = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
 }
 
 export default function WholeSpicesPage() {
+  const pairs = []
+  for (let i = 0; i < wholeSpices.length; i += 2) {
+    pairs.push(wholeSpices.slice(i, i + 2))
+  }
+
   return (
-    <main>
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[60vh] flex items-end bg-primary overflow-hidden pt-28 pb-20 px-8">
-        <div className="noise-overlay opacity-[0.04]" />
-        {/* Decorative glow */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-primary-container/10 blur-[120px] pointer-events-none" />
+    <main className="bg-[#f7f5f0] min-h-screen">
+      <Navbar />
 
-        <div className="max-w-screen-2xl mx-auto w-full relative z-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-primary-fixed/50 hover:text-primary-fixed text-sm font-headline mb-10 transition-colors"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
-            Back to Home
-          </Link>
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <section className="relative h-[75vh] min-h-[520px] overflow-hidden">
+        <Image
+          src="/products/spices-variety.png"
+          alt="Whole spices collection"
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
 
-          <motion.span
-            className="text-primary-fixed-dim/60 font-headline font-bold tracking-[0.25em] uppercase text-xs mb-6 block"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            The Collection
-          </motion.span>
-
-          <BlurText
-            text="Whole Spices"
-            className="text-primary-fixed font-headline font-extrabold text-6xl md:text-8xl leading-none mb-6"
-            delay={80}
-            animateBy="words"
-          />
-
-          <motion.p
-            className="text-primary-fixed/55 text-lg md:text-xl max-w-xl leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            Hand-harvested and sun-dried, preserving their essential oils and vibrant aromatics.
-            Nineteen botanicals in their most primal, unaltered form.
-          </motion.p>
-
-          <motion.div
-            className="flex items-center gap-4 mt-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-          >
-            <div className="h-px w-12 bg-primary-fixed/20" />
-            <span className="text-primary-fixed/40 font-headline italic text-sm">
-              {wholeSpices.length} varieties available
+        {/* Glassmorphism info card */}
+        <motion.div
+          className="absolute bottom-12 left-8 md:left-16 max-w-md"
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <div className="bg-[#021c10]/75 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+            <span className="text-primary-fixed/50 font-headline font-bold tracking-[0.25em] uppercase text-xs mb-3 block">
+              Our Whole Spices
             </span>
-          </motion.div>
-        </div>
+            <h1 className="text-primary-fixed font-headline font-extrabold text-4xl md:text-5xl leading-tight mb-4">
+              Nature&apos;s Botanicals,<br />
+              <span className="font-light italic">Unaltered.</span>
+            </h1>
+            <p className="text-primary-fixed/65 text-sm leading-relaxed">
+              Hand-harvested and sun-dried, preserving essential oils and vibrant aromatics across {wholeSpices.length} varieties.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Back link */}
+        <Link
+          href="/"
+          className="absolute top-24 left-8 md:left-16 inline-flex items-center gap-2 text-white/60 hover:text-white text-sm font-headline transition-colors bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
+          Back to Home
+        </Link>
       </section>
 
-      {/* ── Product Grid ─────────────────────────────────────────────────── */}
-      <section className="py-24 px-8 bg-surface">
+      {/* ── Collection Grid ──────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 md:px-12 lg:px-16">
         <div className="max-w-screen-2xl mx-auto">
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-60px' }}
+            className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
           >
-            {wholeSpices.map((spice) => (
-              <motion.div key={spice.name} variants={cardVariant}>
-                <SpotlightCard
-                  className="group h-full rounded-2xl bg-surface-container border border-outline-variant/30 hover:border-outline/50 hover:shadow-lg transition-all duration-300"
-                  spotlightColor="rgba(2, 28, 16, 0.06)"
-                >
-                  <div className="p-7 flex flex-col h-full min-h-[220px]">
-                    {/* Color dot */}
-                    <div
-                      className="w-3 h-3 rounded-full mb-5 shrink-0"
-                      style={{ backgroundColor: spice.color }}
-                    />
-                    <h3 className="font-headline font-extrabold text-xl text-primary mb-3 group-hover:translate-x-0.5 transition-transform duration-300">
-                      {spice.name}
-                    </h3>
-                    <p className="text-on-surface/55 text-sm leading-relaxed flex-grow mb-6">
-                      {spice.desc}
-                    </p>
-                    <a
-                      href="mailto:hello@rawatorganics.com?subject=Inquiry: Whole Spices"
-                      className="inline-flex items-center gap-1.5 text-xs font-headline font-bold text-primary/70 hover:text-primary hover:gap-3 transition-all duration-300"
-                    >
-                      Inquire
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
-                        arrow_forward
-                      </span>
-                    </a>
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            ))}
+            <div>
+              <span className="text-primary/50 font-headline font-bold tracking-[0.25em] uppercase text-xs mb-3 block">
+                Rawat Organics
+              </span>
+              <h2 className="text-primary font-headline font-extrabold text-4xl md:text-5xl">
+                The <span className="font-light italic">Collection</span>
+              </h2>
+            </div>
+            <p className="text-on-surface/50 font-headline text-sm max-w-xs leading-relaxed">
+              {wholeSpices.length} hand-selected varieties in their most primal, unaltered form.
+            </p>
           </motion.div>
+
+          {/* Bento rows — alternating 3fr 2fr / 2fr 3fr */}
+          <div className="flex flex-col gap-5">
+            {pairs.map((pair, rowIdx) => (
+              <div
+                key={rowIdx}
+                className={`grid gap-5 ${
+                  pair.length === 1
+                    ? 'grid-cols-1'
+                    : rowIdx % 2 === 0
+                    ? 'grid-cols-1 md:grid-cols-[3fr_2fr]'
+                    : 'grid-cols-1 md:grid-cols-[2fr_3fr]'
+                }`}
+              >
+                {pair.map((spice, colIdx) => {
+                  const isLarge = pair.length === 1 || (rowIdx % 2 === 0 ? colIdx === 0 : colIdx === 1)
+                  return (
+                    <motion.div
+                      key={spice.slug}
+                      custom={rowIdx * 2 + colIdx}
+                      variants={fadeUp}
+                      initial="hidden"
+                      whileInView="show"
+                      viewport={{ once: true, margin: '-40px' }}
+                    >
+                      <Link
+                        href={`/whole-spices/${spice.slug}`}
+                        className="group block relative overflow-hidden rounded-2xl bg-[#021c10]"
+                        style={{ aspectRatio: isLarge ? '16/10' : '4/3' }}
+                      >
+                        {/* Product image */}
+                        <Image
+                          src={spice.primaryImage}
+                          alt={spice.name}
+                          fill
+                          className="object-cover opacity-60 transition-transform duration-700 ease-out group-hover:scale-105 group-hover:opacity-70"
+                        />
+
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#021c10] via-[#021c10]/30 to-transparent" />
+
+                        {/* Content overlay */}
+                        <div className="absolute inset-0 p-7 flex flex-col justify-between">
+                          {/* Top: badge */}
+                          <div className="flex items-start justify-between">
+                            <span
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase"
+                              style={{ backgroundColor: `${spice.color}25`, color: spice.color, border: `1px solid ${spice.color}40` }}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: spice.color }} />
+                              Whole Spice
+                            </span>
+
+                            <span className="material-symbols-outlined text-white/0 group-hover:text-white/80 -translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500" style={{ fontSize: '22px' }}>
+                              north_east
+                            </span>
+                          </div>
+
+                          {/* Bottom: name + description */}
+                          <div>
+                            <h3 className="text-white font-headline font-extrabold text-2xl md:text-3xl mb-2 leading-tight">
+                              {spice.name}
+                            </h3>
+                            <p className="text-white/55 text-xs md:text-sm leading-relaxed max-w-xs line-clamp-2">
+                              {spice.description}
+                            </p>
+                            <div className="mt-5 inline-flex items-center gap-2 text-white/70 group-hover:text-white font-headline font-semibold text-xs tracking-wider uppercase transition-colors duration-300">
+                              View Details
+                              <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1" style={{ fontSize: '14px' }}>arrow_forward</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── CTA Quote ────────────────────────────────────────────────────── */}
+      {/* ── Quote + CTA ──────────────────────────────────────────────────────── */}
       <section className="bg-primary py-28 px-8 relative overflow-hidden">
         <div className="noise-overlay opacity-[0.04]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary-container/20 blur-[100px] pointer-events-none" />
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <span
             className="material-symbols-outlined text-5xl text-primary-fixed/10 mb-8 block"
@@ -157,8 +189,8 @@ export default function WholeSpicesPage() {
             — The Rawat Philosophy
           </p>
           <a
-            href="mailto:hello@rawatorganics.com?subject=Wholesale Inquiry"
-            className="inline-flex items-center gap-3 px-10 py-4 bg-primary-fixed text-primary font-headline font-bold rounded-full hover:scale-105 active:scale-95 transition-all duration-300"
+            href="mailto:hello@rawatorganics.com?subject=Wholesale Inquiry — Whole Spices"
+            className="inline-flex items-center gap-3 px-10 py-4 bg-primary-fixed text-primary font-headline font-bold rounded-full hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
           >
             Inquire for Wholesale
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>north_east</span>

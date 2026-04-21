@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npx tsc *)",
       "Read(//c/Users/MY PC/.claude/projects/c--Users-MY-PC-Desktop-Rawat-Organics/**)",
-      "Read(//c/Users/MY PC/.claude/projects/c--Users-MY-PC-Desktop-Rawat-Organics/memory/**)"
+      "Read(//c/Users/MY PC/.claude/projects/c--Users-MY-PC-Desktop-Rawat-Organics/memory/**)",
+      "Bash(mkdir -p \"d:/JAYESH/Rawat-Organics/rawat_next/app/whole-spices/[slug]\")",
+      "Bash(mkdir -p \"d:/JAYESH/Rawat-Organics/rawat_next/app/powder-spices/[slug]\")",
+      "Bash(npm run *)"
     ]
   }
 }

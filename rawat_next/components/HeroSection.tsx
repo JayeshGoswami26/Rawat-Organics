@@ -1,15 +1,16 @@
 "use client";
 
-/**
- * HeroSection — Light pillar (WebGL) + scroll-driven copy
- */
-
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import LightPillar from "./LightPillar";
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
+import dynamic from "next/dynamic";
+const LightPillar = dynamic(() => import("./LightPillar"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-black" />,
+});
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollProgressRef = useRef<number>(0);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -20,6 +21,10 @@ export default function HeroSection() {
     stiffness: 120,
     damping: 20,
     mass: 0.3,
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    scrollProgressRef.current = v;
   });
 
   const textOpacity = useTransform(springProgress, [0, 0.22], [1, 0]);
@@ -34,7 +39,7 @@ export default function HeroSection() {
       id="hero"
     >
       <div className="sticky top-0 h-screen overflow-hidden bg-black">
-        {/* Light pillar — fills hero; black shows behind / through blend */}
+        {/* Light pillar */}
         <div className="absolute inset-0 z-0">
           <div
             style={{
@@ -49,19 +54,20 @@ export default function HeroSection() {
               bottomColor="#40d03c"
               intensity={1}
               rotationSpeed={0.3}
-              glowAmount={0.002}
-              pillarWidth={3}
+              glowAmount={0.005}
+              pillarWidth={5}
               pillarHeight={0.4}
-              noiseIntensity={0.5}
+              noiseIntensity={0.2}
               pillarRotation={25}
               interactive={false}
               mixBlendMode="screen"
               quality="high"
+              scrollProgressRef={scrollProgressRef}
             />
           </div>
         </div>
 
-        {/* Readability: subtle vignette on black */}
+        {/* Vignette */}
         <div
           style={{
             position: "absolute",
@@ -120,7 +126,7 @@ export default function HeroSection() {
           >
             <a
               href="#collection"
-              className="w-full sm:w-auto px-10 py-4 bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-primary font-headline font-bold text-base rounded-full hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
+              className="w-full sm:w-auto px-10 py-4 bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed font-headline font-bold text-base rounded-full hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
             >
               Inquire Now
             </a>
