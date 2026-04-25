@@ -30,6 +30,14 @@ const SYSTEM_PERMISSIONS = [
   { resource: 'orders', action: 'create', description: 'Create orders' },
   { resource: 'orders', action: 'update', description: 'Update orders' },
   { resource: 'orders', action: 'delete', description: 'Delete orders' },
+  { resource: 'categories', action: 'read', description: 'View categories' },
+  { resource: 'categories', action: 'create', description: 'Create categories' },
+  { resource: 'categories', action: 'update', description: 'Update categories' },
+  { resource: 'categories', action: 'delete', description: 'Delete categories' },
+  { resource: 'inquiries', action: 'read', description: 'View inquiries' },
+  { resource: 'inquiries', action: 'update', description: 'Update inquiry status' },
+  { resource: 'analytics', action: 'read', description: 'View analytics data' },
+  { resource: 'media', action: 'create', description: 'Upload media files' },
 ];
 
 const seed = async () => {

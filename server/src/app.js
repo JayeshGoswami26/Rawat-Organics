@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -34,7 +35,7 @@ app.use(
     origin: config.cors.origin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-Id'],
   })
 );
 
@@ -58,6 +59,9 @@ app.use(morgan(config.env === 'production' ? 'combined' : 'dev', { stream: morga
 
 // Global rate limiter
 app.use(globalLimiter);
+
+// Serve uploaded images as static files
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // API routes
 app.use(routes);

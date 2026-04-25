@@ -31,6 +31,18 @@ const PERMISSIONS = {
   ORDERS_CREATE: 'orders:create',
   ORDERS_UPDATE: 'orders:update',
   ORDERS_DELETE: 'orders:delete',
+
+  CATEGORIES_READ: 'categories:read',
+  CATEGORIES_CREATE: 'categories:create',
+  CATEGORIES_UPDATE: 'categories:update',
+  CATEGORIES_DELETE: 'categories:delete',
+
+  INQUIRIES_READ: 'inquiries:read',
+  INQUIRIES_UPDATE: 'inquiries:update',
+
+  ANALYTICS_READ: 'analytics:read',
+
+  MEDIA_CREATE: 'media:create',
 };
 
 module.exports = { ROLES, PERMISSIONS };

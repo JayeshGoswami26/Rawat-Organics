@@ -36,4 +36,4 @@ const strictLimiter = createLimiter({
   message: 'Too many requests to this endpoint',
 });
 
-module.exports = { globalLimiter, authLimiter, strictLimiter };
+module.exports = { globalLimiter, authLimiter, strictLimiter, createLimiter };
