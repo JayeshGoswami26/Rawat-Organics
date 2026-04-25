@@ -1,0 +1,18 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "feat/landing",
+    "main",
+    "video-scroll"
+  ],
+  "parent": {
+    "feat/landing": "main",
+    "main": null,
+    "video-scroll": "main"
+  },
+  "order": [
+    "main",
+    "feat/landing",
+    "video-scroll"
+  ]
+}
